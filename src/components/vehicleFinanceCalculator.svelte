@@ -7,11 +7,11 @@
   let interestRate = 11.5;
 
   function calculateRepayment(
-    purchaseAmount,
-    depositAmount,
-    paymentTerm,
-    balloonAmount,
-    interestRate
+    purchaseAmount: number,
+    depositAmount: number,
+    paymentTerm: number,
+    balloonAmount: number,
+    interestRate: number
   ) {
     // Loan principal (purchase amount minus deposit amount)
     let loanAmount = purchaseAmount - depositAmount;
