@@ -1,17 +1,16 @@
 ---
-
+import VehicleFinanceCalculator from "../components/vehicleFinanceCalculator.svelte";
 ---
 
 <html lang="en" data-theme="cupcake">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-	<body>
-		<h1 class="text-orange-500">Tax calculator</h1>
-		<input type="text" class="input input-bordered">
-	</body>
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="generator" content={Astro.generator} />
+    <title>Calculators</title>
+  </head>
+  <body class="p-4 flex flex-col items-center">
+    <VehicleFinanceCalculator client:load="svelte" />
+  </body>
 </html>
