@@ -1,0 +1,32 @@
+---
+// add props
+const { title, description, favicon } = Astro.props;
+import "@fontsource-variable/montserrat";
+import "@fontsource/schoolbell";
+import "../styles/global.css";
+---
+
+<html lang="en" data-theme="garden">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" href={`https://fav.farm/${favicon ?? "🧮"}`} />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="generator" content={Astro.generator} />
+    <title>{title ?? `calcs.co.za`}</title>
+    <meta name="description" content={description} />
+  </head>
+  <body class="p-4 flex flex-col items-center">
+    <a href="/" class="font-serif text-lg font-semibold hover:underline"
+      >calcs.co.za</a
+    >
+    <div class="flex flex-col mt-2 mb-8 gap-y-1">
+      <h1 class="text-center text-2xl font-bold">
+        {title}
+      </h1>
+      <h2 class="text-center -mt-2 text-sm">
+        {description}
+      </h2>
+    </div>
+    <slot />
+  </body>
+</html>

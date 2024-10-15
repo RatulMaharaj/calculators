@@ -1,124 +1,174 @@
 <script lang="ts">
-  let purchaseAmount = 350_000;
-  let depositAmount = 10_000;
-  let paymentTerm = 72;
-  let balloonAmount = 0;
-  let primeinterestRate = 11.5;
+  import { calculateRepayment, createAmortizationSchedule } from "../lib/amort";
+  import { formatCurrency } from "../lib/format";
+
+  let purchaseAmount = 240_000;
+  let depositAmount = 0;
+  let paymentTerm = 60;
+  let balloonRate = 20;
+  let primeInterestRate = 11.5;
   let interestRate = 11.5;
 
-  function calculateRepayment(
-    purchaseAmount: number,
-    depositAmount: number,
-    paymentTerm: number,
-    balloonAmount: number,
-    interestRate: number
-  ) {
-    // Loan principal (purchase amount minus deposit amount)
-    let loanAmount = purchaseAmount - depositAmount;
+  // options
+  let includeInitiationFee = true;
+  let includeMonthlyFee = true;
+  let payInArrears = false;
 
-    // Monthly interest rate
-    let monthlyInterestRate = interestRate / 100 / 12;
-
-    // Calculate monthly payment using the amortization formula
-    let monthlyPayment =
-      (loanAmount *
-        monthlyInterestRate *
-        Math.pow(1 + monthlyInterestRate, paymentTerm)) /
-      (Math.pow(1 + monthlyInterestRate, paymentTerm) - 1);
-
-    return monthlyPayment.toFixed(2); // Return the payment amount rounded to 2 decimal places
-  }
-
-  let repaymentAmount = calculateRepayment(
+  let amort = calculateRepayment({
     purchaseAmount,
     depositAmount,
     paymentTerm,
-    balloonAmount,
-    interestRate
-  );
+    balloonRate,
+    interestRate,
+    includeInitiationFee,
+    includeMonthlyFee,
+    payInArrears,
+  });
 
   $: {
-    repaymentAmount = calculateRepayment(
+    amort = calculateRepayment({
       purchaseAmount,
       depositAmount,
       paymentTerm,
-      balloonAmount,
-      interestRate
-    );
+      balloonRate,
+      interestRate,
+      includeInitiationFee,
+      includeMonthlyFee,
+      payInArrears,
+    });
   }
 </script>
 
 <div class="flex flex-col gap-y-2 w-full sm:max-w-md">
-  <h1 class="text-center text-3xl font-bold">Vehicle Finance Calculator 🚗</h1>
-  <h2 class="text-center -mt-2">Estimate your monthly loan repayments</h2>
-  <br />
   <label class="flex flex-col gap-2">
-    <span>Purchase Amount</span>
+    <span class="text-xs">Purchase Amount</span>
     <input
-      type="text"
+      type="number"
+      min="0"
       placeholder="Purchase Amount"
       class="input input-bordered"
-      bind:value={purchaseAmount}
+      value={purchaseAmount}
+      on:input={(e) => (purchaseAmount = Math.abs(e.target.value))}
     />
   </label>
   <label class="flex flex-col gap-2">
-    <span>Deposit Amount</span>
+    <span class="text-xs">Deposit Amount</span>
     <input
-      type="text"
+      type="number"
       placeholder="Deposit Amount"
       class="input input-bordered"
-      bind:value={depositAmount}
+      value={depositAmount}
+      on:input={(e) =>
+        (depositAmount =
+          Math.abs(e.target.value) > purchaseAmount
+            ? purchaseAmount
+            : Math.abs(e.target.value))}
     />
   </label>
 
   <label class="flex flex-col gap-2">
-    <span class="flex w-full justify-between">
+    <span class="flex w-full justify-between text-xs">
       <span>Payment Term</span>
       <span>{paymentTerm} months</span>
     </span>
     <input
       type="range"
-      min="0"
+      min="12"
       max="96"
-      step="12"
+      step="6"
       bind:value={paymentTerm}
       class="range w-full"
     />
   </label>
   <label class="flex flex-col gap-2">
-    <span class="flex w-full justify-between">
+    <span class="flex w-full justify-between text-xs">
       <span>Balloon Payment</span>
-      <span>{balloonAmount}%</span>
+      <span>{balloonRate}%</span>
     </span>
     <input
       type="range"
       min="0"
-      max="35"
+      max="45"
       step="5"
-      bind:value={balloonAmount}
+      bind:value={balloonRate}
       class="range w-full"
     />
   </label>
   <label class="flex flex-col gap-2">
-    <span class="flex w-full justify-between">
+    <span class="flex w-full justify-between text-xs">
       <span>Interest Rate</span>
       <span>{interestRate}%</span>
     </span>
     <input
       type="range"
-      min={primeinterestRate - 4}
-      max={primeinterestRate + 4}
+      min={primeInterestRate - 4}
+      max={30}
       step={0.25}
       bind:value={interestRate}
       class="range w-full"
     />
   </label>
 
-  <div class="stats shadow mt-4">
+  <div class="stats bg-base-200 shadow mt-4">
     <div class="stat">
-      <div class="stat-title">Estimate monthly repayment</div>
-      <div class="stat-value">{repaymentAmount}</div>
-      <div class="stat-desc">21% more than last month</div>
+      <div class="stat-value text-center">
+        {formatCurrency(amort.installment)}
+      </div>
+      <div class="stat-title text-sm text-center">
+        Estimated monthly repayment
+      </div>
+
+      {#if amort.balloonAmountPayable > 0}
+        <div
+          class="w-full justify-between text-accent font-medium flex text-xs mt-4"
+        >
+          <span>Balloon amount payable after {paymentTerm} months</span>
+          <span>{formatCurrency(amort.balloonAmountPayable)}</span>
+        </div>
+      {/if}
+      <div class="w-full justify-between flex text-xs mt-2">
+        <span>Total amount repayable</span>
+        <span>{formatCurrency(amort.totalPayable)}</span>
+      </div>
+      <div class="w-full justify-between flex font-bold text-xs mt-1">
+        <span>Total interest payable</span>
+        <span>{formatCurrency(amort.totalInterestPayable)}</span>
+      </div>
+      <div class="w-full justify-between flex text-xs mt-1">
+        <span>Total fees payable</span>
+        <span>{formatCurrency(amort.totalFeesPayable)}</span>
+      </div>
     </div>
+  </div>
+  <div class="form-control mt-4">
+    <label class="label cursor-pointer">
+      <span class="label-text text-xs"
+        >Finance initiation fee of {formatCurrency(1207.5)}</span
+      >
+      <input
+        type="checkbox"
+        class="toggle toggle-accent"
+        bind:checked={includeInitiationFee}
+      />
+    </label>
+    <label class="label cursor-pointer">
+      <span class="label-text text-xs"
+        >Include monthly fee of {formatCurrency(69)}</span
+      >
+      <input
+        type="checkbox"
+        class="toggle toggle-accent"
+        bind:checked={includeMonthlyFee}
+      />
+    </label>
+
+    <label class="label cursor-pointer">
+      <span class="label-text text-xs">Payments in arrears</span>
+      <input
+        type="checkbox"
+        class="toggle toggle-accent"
+        bind:checked={payInArrears}
+      />
+    </label>
   </div>
 </div>
