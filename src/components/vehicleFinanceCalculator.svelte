@@ -2,12 +2,12 @@
   import { calculateRepayment, createAmortizationSchedule } from "../lib/amort";
   import { formatCurrency } from "../lib/format";
 
-  let purchaseAmount = 240_000;
+  let purchaseAmount = 350_000;
   let depositAmount = 0;
-  let paymentTerm = 60;
-  let balloonRate = 20;
+  let paymentTerm = 72;
+  let balloonRate = 0;
   let primeInterestRate = 11.5;
-  let interestRate = 11.5;
+  let interestRate = 14.5;
 
   // options
   let includeInitiationFee = true;

@@ -1,10 +1,15 @@
 ---
 import AppLayout from "../layouts/AppLayout.astro";
-import VehicleFinanceCalculator from "../components/vehicleFinanceCalculator.svelte";
-const title = "Vehicle Finance Calculator";
-const description = "Estimate your monthly loan repayments";
 ---
 
-<AppLayout title={title} description={description} favicon="🏎️">
-  <VehicleFinanceCalculator client:load="svelte" />
+<AppLayout favicon="🙋🏽‍♂️" description="Calculators made for South Africans 🇿🇦">
+  <div class="flex flex-col w-full sm:max-w-md">
+    <a
+      href="/vehicle-finance"
+      class="card gap-y-1 bg-base-200 text-center hover:bg-base-300 transition-all p-4 w-full flex flex-col"
+    >
+      <span class="text-sm font-medium">Vehicle Finance Calculator 🏎️</span>
+      <span class="text-xs">Estimate your monthly loan repayments</span>
+    </a>
+  </div>
 </AppLayout>
