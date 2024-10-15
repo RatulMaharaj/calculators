@@ -2,6 +2,7 @@
 // add props
 const { title, description, favicon } = Astro.props;
 import { ViewTransitions } from "astro:transitions";
+import PostHog from "../components/posthog.astro";
 import "@fontsource-variable/montserrat";
 import "@fontsource/schoolbell";
 import "../styles/global.css";
@@ -49,5 +50,6 @@ import "../styles/global.css";
       </div>
       <slot />
     </main>
+    <PostHog />
   </body>
 </html>
