@@ -1,6 +1,7 @@
 ---
 // add props
 const { title, description, favicon } = Astro.props;
+import { ViewTransitions } from "astro:transitions";
 import "@fontsource-variable/montserrat";
 import "@fontsource/schoolbell";
 import "../styles/global.css";
@@ -17,6 +18,19 @@ import "../styles/global.css";
       name="description"
       content={description ?? "Calculators made for South Africans 🇿🇦"}
     />
+    <link rel="canonical" href="https://calcs.co.za" />
+    <meta
+      property="og:title"
+      content="calcs.co.za - Calculators made for South Africans 🇿🇦"
+    />
+    <meta property="og:url" content="https://calcs.co.za" />
+    <meta
+      property="og:description"
+      content={description ?? "Calculators made for South Africans 🇿🇦"}
+    />
+    <meta property="og:image" content="/og.png" />
+
+    <ViewTransitions />
   </head>
   <body class="p-4 flex flex-col items-center">
     <header>
