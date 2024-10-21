@@ -1,11 +1,10 @@
-<script lang="ts">
-  import { calculateRepayment, createAmortizationSchedule } from "../lib/amort";
+<script>
+  import { calculateRepayment } from "../lib/amort";
   import { formatCurrency } from "../lib/format";
 
   let purchaseAmount = 1_500_000;
   let depositAmount = 0;
   let paymentTerm = 20;
-  let balloonRate = 0;
   let primeInterestRate = 11.5;
   let interestRate = 14.5;
 
@@ -18,7 +17,7 @@
     purchaseAmount,
     depositAmount,
     paymentTerm,
-    balloonRate,
+    balloonRate: 0,
     interestRate,
     includeInitiationFee,
     includeMonthlyFee,
@@ -30,7 +29,7 @@
       purchaseAmount,
       depositAmount,
       paymentTerm,
-      balloonRate,
+      balloonRate: 0,
       interestRate,
       includeInitiationFee,
       includeMonthlyFee,
@@ -48,7 +47,7 @@
       placeholder="Purchase Amount"
       class="input input-bordered"
       value={purchaseAmount}
-      on:input={(e) => (purchaseAmount = Math.abs(e.target.value))}
+      on:input={(e) => (purchaseAmount = Math.abs(e?.target?.value))}
     />
   </label>
   <label class="flex flex-col gap-2">
@@ -58,11 +57,12 @@
       placeholder="Deposit Amount"
       class="input input-bordered"
       value={depositAmount}
-      on:input={(e) =>
-        (depositAmount =
+      on:input={(e) => {
+        depositAmount =
           Math.abs(e.target.value) > purchaseAmount
             ? purchaseAmount
-            : Math.abs(e.target.value))}
+            : Math.abs(e.target.value);
+      }}
     />
   </label>
 
