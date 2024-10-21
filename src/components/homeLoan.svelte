@@ -1,22 +1,44 @@
 <script>
   import { calculateRepayment } from "../lib/amort";
   import { formatCurrency } from "../lib/format";
+  import {
+    getDeedsOfficeFee,
+    getTransferDuty,
+    getAttorneyTransferFee,
+    VAT,
+    bankAdminFee,
+  } from "../lib/homeloan";
+  import LineItem from "./lineItem.svelte";
 
   let purchaseAmount = 1_500_000;
   let depositAmount = 0;
   let paymentTerm = 20;
   let primeInterestRate = 11.5;
-  let interestRate = 14.5;
+  let interestRate = 11.75;
+
+  // fees
+  let costs = {
+    bondDeedsOfficeFee: getDeedsOfficeFee(purchaseAmount),
+    bondRegistrationFee: getAttorneyTransferFee(purchaseAmount),
+    transferDeedsOfficeFee: getDeedsOfficeFee(purchaseAmount),
+    transferDuty: getTransferDuty(purchaseAmount),
+    transferFee: getAttorneyTransferFee(purchaseAmount),
+    vatOnBondRegistration: getAttorneyTransferFee(purchaseAmount) * VAT,
+    vatOnTransferFee: getAttorneyTransferFee(purchaseAmount) * VAT,
+    bankInitiationFee: bankAdminFee,
+  };
+
+  let totalCosts = Object.values(costs).reduce((acc, val) => acc + val, 0);
 
   // options
-  let includeInitiationFee = true;
-  let includeMonthlyFee = true;
+  let includeInitiationFee = false;
+  let includeMonthlyFee = false;
   let payInArrears = false;
 
   let amort = calculateRepayment({
     purchaseAmount,
     depositAmount,
-    paymentTerm,
+    paymentTerm: paymentTerm * 12,
     balloonRate: 0,
     interestRate,
     includeInitiationFee,
@@ -28,13 +50,28 @@
     amort = calculateRepayment({
       purchaseAmount,
       depositAmount,
-      paymentTerm,
+      paymentTerm: paymentTerm * 12,
       balloonRate: 0,
       interestRate,
       includeInitiationFee,
       includeMonthlyFee,
       payInArrears,
     });
+  }
+
+  $: {
+    costs = {
+      transferDeedsOfficeFee: getDeedsOfficeFee(purchaseAmount),
+      bondRegistrationFee: getAttorneyTransferFee(purchaseAmount),
+      transferFee: getAttorneyTransferFee(purchaseAmount),
+      bondDeedsOfficeFee: getDeedsOfficeFee(purchaseAmount),
+      transferDuty: getTransferDuty(purchaseAmount),
+      vatOnBondRegistration: getAttorneyTransferFee(purchaseAmount) * VAT,
+      vatOnTransferFee: getAttorneyTransferFee(purchaseAmount) * VAT,
+      bankInitiationFee: bankAdminFee,
+    };
+
+    totalCosts = Object.values(costs).reduce((acc, val) => acc + val, 0);
   }
 </script>
 
@@ -112,42 +149,53 @@
           <span>{formatCurrency(amort.balloonAmountPayable)}</span>
         </div>
       {/if}
-      <div class="w-full justify-between flex text-xs mt-2">
-        <span>Total amount repayable</span>
-        <span>{formatCurrency(amort.totalPayable)}</span>
-      </div>
-      <div class="w-full justify-between flex font-bold text-xs mt-1">
-        <span>Total interest payable</span>
-        <span>{formatCurrency(amort.totalInterestPayable)}</span>
-      </div>
-      <div class="w-full justify-between flex text-xs mt-1">
-        <span>Total fees payable</span>
-        <span>{formatCurrency(amort.totalFeesPayable)}</span>
-      </div>
+      <LineItem label="Total amount repayable" amount={amort.totalPayable} />
+      <LineItem
+        classes="font-bold"
+        label="Total interest payable"
+        amount={amort.totalInterestPayable}
+      />
+      <br />
+      <LineItem label="Transfer Fees" amount={undefined} classes="underline" />
+      <LineItem
+        label="Deeds Office Fees"
+        amount={costs.transferDeedsOfficeFee}
+      />
+      <LineItem label="Attorney Transfer Fees" amount={costs.transferFee} />
+      <LineItem label="VAT" amount={costs.vatOnTransferFee} />
+      <LineItem
+        label="Total Transfer Fees"
+        amount={costs.transferDeedsOfficeFee +
+          costs.transferFee +
+          costs.vatOnTransferFee}
+      />
+      <br />
+      <LineItem label="Bond Fees:" amount={undefined} classes="underline" />
+      <LineItem label="Deeds Office Fees" amount={costs.bondDeedsOfficeFee} />
+      <LineItem
+        label="Attorney Bond Registration"
+        amount={costs.bondRegistrationFee}
+      />
+      <LineItem label="VAT" amount={costs.vatOnBondRegistration} />
+      <LineItem
+        label="Total Bond Registration Fees"
+        amount={costs.bondDeedsOfficeFee +
+          costs.bondRegistrationFee +
+          costs.vatOnBondRegistration}
+      />
+      <br />
+      <LineItem
+        label="Transfer Duty (Payable to SARS)"
+        amount={costs.transferDuty}
+      />
+      <LineItem
+        label="Bank Initiation Fee (Including VAT)"
+        amount={costs.bankInitiationFee}
+      />
+      <LineItem label="Total Fees" classes="font-bold" amount={totalCosts} />
     </div>
   </div>
   <div class="form-control mt-4">
-    <label class="label cursor-pointer">
-      <span class="label-text text-xs"
-        >Finance initiation fee of {formatCurrency(1207.5)}</span
-      >
-      <input
-        type="checkbox"
-        class="toggle toggle-accent"
-        bind:checked={includeInitiationFee}
-      />
-    </label>
-    <label class="label cursor-pointer">
-      <span class="label-text text-xs"
-        >Include monthly fee of {formatCurrency(69)}</span
-      >
-      <input
-        type="checkbox"
-        class="toggle toggle-accent"
-        bind:checked={includeMonthlyFee}
-      />
-    </label>
-
     <label class="label cursor-pointer">
       <span class="label-text text-xs">Payments in arrears</span>
       <input
