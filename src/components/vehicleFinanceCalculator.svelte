@@ -1,5 +1,5 @@
-<script lang="ts">
-  import { calculateRepayment, createAmortizationSchedule } from "../lib/amort";
+<script>
+  import { calculateRepayment } from "../lib/amort";
   import { formatCurrency } from "../lib/format";
 
   let purchaseAmount = 350_000;
