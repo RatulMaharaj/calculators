@@ -1,10 +1,10 @@
 ---
 import AppLayout from "../layouts/AppLayout.astro";
-import HomeLoan from "../components/homeLoan.svelte";
+import HomeLoanCalculator from "../components/homeLoanCalculator.svelte";
 const title = "Home Loan Calculator 🏠";
 const description = "Estimate monthly mortgage repayments";
 ---
 
 <AppLayout title={title} description={description} favicon="🏠">
-  <HomeLoan client:load="svelte" />
+  <HomeLoanCalculator client:load="svelte" />
 </AppLayout>
